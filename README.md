@@ -1,1 +1,1 @@
-"# ai_generator3" 
+This is a fun and interactive website designed for students to generate customized practice questions to help them prepare for exams. By entering a topic of their choice or providing a model question, the AI intelligently generates relevant practice questions with variations in numerical values, ensuring effective learning.
