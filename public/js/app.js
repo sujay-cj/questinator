@@ -1,4 +1,5 @@
-// Toggle theme function
+// app.js
+// Theme Management
 function toggleTheme() {
     const body = document.body;
     const sunIcon = document.querySelector('.fa-sun');
@@ -13,7 +14,6 @@ function toggleTheme() {
     localStorage.setItem('theme', isLight ? 'light' : 'dark');
 }
 
-// Initialize theme from localStorage
 function initTheme() {
     const savedTheme = localStorage.getItem('theme') || 'dark';
     if (savedTheme === 'light') {
@@ -24,11 +24,10 @@ function initTheme() {
 }
 initTheme();
 
-// Prevent multiple topic loads
+// Topic Management
 let topicsLoaded = false;
+
 async function loadPopularTopics() {
-    if (topicsLoaded) return;
-    
     const topicsList = document.getElementById('topics-list');
     topicsList.innerHTML = '<div class="loader"></div>';
     
@@ -47,12 +46,23 @@ async function loadPopularTopics() {
     }
 }
 
+function clearPopularTopics() {
+    const topicsList = document.getElementById('topics-list');
+    const topicHeader = document.getElementById('topic');
+    
+    // Immediate visual clearance
+    topicsList.innerHTML = '';
+    topicHeader.style.display = 'none';
+    topicsLoaded = false;
+}
+
+// Core Functionality
 async function generate() {
     const input = document.getElementById('input').value.trim();
     const isTopic = document.getElementById('isTopic').checked;
     const resultDiv = document.getElementById('result');
 
-    if (input === '') {
+    if (!input) {
         resultDiv.innerHTML = '<p class="error">Please enter a question or topic.</p>';
         return;
     }
@@ -73,26 +83,27 @@ async function generate() {
     }
 }
 
-// Handle Enter key press in input field
 function handleKeyPress(event) {
-    if (event.key === 'Enter') {
-        generate();
-    }
+    if (event.key === 'Enter') generate();
 }
 
+// Tab Management
 function switchTab(tabName) {
-    document.querySelectorAll('.tab-content').forEach(tab => {
-        tab.classList.remove('active');
-    });
-    document.querySelectorAll('.tab').forEach(tab => {
-        tab.classList.remove('active');
-    });
+    // Clear topics when leaving Popular tab
+    if (tabName === 'generator') {
+        clearPopularTopics();
+    }
+
+    // Tab switching logic
+    document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
     
     document.getElementById(tabName).classList.add('active');
     document.querySelector(`button[onclick="switchTab('${tabName}')"]`).classList.add('active');
 
-    // Show "Trending Topics" only when the "Popular" tab is active
-    document.getElementById('topic').style.display = (tabName === 'popular') ? 'block' : 'none';
-
-    if (tabName === 'popular') loadPopularTopics();
+    // Handle Popular tab specifics
+    if (tabName === 'popular') {
+        document.getElementById('topic').style.display = 'block';
+        if (!topicsLoaded) loadPopularTopics();
+    }
 }
