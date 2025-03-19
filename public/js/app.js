@@ -30,8 +30,11 @@ async function loadPopularTopics() {
     if (topicsLoaded) return;
     
     const topicsList = document.getElementById('topics-list');
-    topicsList.innerHTML = '<div class="loader"></div>';
+    const topicTitle = document.getElementById('topic');
     
+    topicsList.innerHTML = '<div class="loader"></div>';
+    topicTitle.style.display = 'block'; // Show heading when loading
+
     try {
         const response = await fetch('/popular');
         const topics = await response.json();
@@ -47,7 +50,16 @@ async function loadPopularTopics() {
     }
 }
 
+// Hide trending topics when generating a question
+function hideTrendingTopics() {
+    document.getElementById('topic').style.display = 'none';
+    document.getElementById('topics-list').innerHTML = '';
+    topicsLoaded = false; // Reset so it reloads when Popular is clicked again
+}
+
 async function generate() {
+    hideTrendingTopics(); // Hide topics when generating
+
     const input = document.getElementById('input').value.trim();
     const isTopic = document.getElementById('isTopic').checked;
     const resultDiv = document.getElementById('result');
@@ -91,8 +103,10 @@ function switchTab(tabName) {
     document.getElementById(tabName).classList.add('active');
     document.querySelector(`button[onclick="switchTab('${tabName}')"]`).classList.add('active');
 
-    // Show "Trending Topics" only when the "Popular" tab is active
-    document.getElementById('topic').style.display = (tabName === 'popular') ? 'block' : 'none';
-
-    if (tabName === 'popular') loadPopularTopics();
+    // Show or hide "Trending Topics" based on tab
+    if (tabName === 'popular') {
+        loadPopularTopics();
+    } else {
+        hideTrendingTopics();
+    }
 }
