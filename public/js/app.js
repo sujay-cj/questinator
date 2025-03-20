@@ -23,17 +23,38 @@ function initTheme() {
 }
 initTheme();
 
-// Topic Management
+// Tab Management
 let topicsLoaded = false;
-let cameraStream = null;
+function switchTab(tabName) {
+    const popularContent = document.getElementById('popular');
+    const switchContainer = document.querySelector('.slider-switch');
+    const labels = document.querySelectorAll('.slider-label');
 
+    // Update active state
+    switchContainer.setAttribute('data-active', tabName);
+    labels.forEach(label => label.classList.remove('active'));
+    document.querySelector(`.slider-label[onclick="switchTab('${tabName}')"]`).classList.add('active');
+
+    // Handle content transitions
+    if (tabName === 'popular') {
+        popularContent.classList.add('active');
+        if (!topicsLoaded) loadPopularTopics();
+    } else {
+        popularContent.classList.remove('active');
+        clearPopularTopics();
+    }
+}
+
+// Topic Management
 async function loadPopularTopics() {
     const topicsList = document.getElementById('topics-list');
-    topicsList.innerHTML = '<div class="loader"></div>';
+    topicsList.innerHTML = '<div class="loader">Loading...</div>';
     
     try {
         const response = await fetch('/popular');
+        if (!response.ok) throw new Error('Failed to fetch topics');
         const topics = await response.json();
+        
         topicsList.innerHTML = topics.map(topic => `
             <div class="topic-item">
                 <span>${topic.topic}</span>
@@ -42,36 +63,30 @@ async function loadPopularTopics() {
         `).join('');
         topicsLoaded = true;
     } catch (error) {
-        topicsList.innerHTML = `Error loading topics: ${error.message}`;
+        topicsList.innerHTML = `<div class="error">Error: ${error.message}</div>`;
     }
 }
 
 function clearPopularTopics() {
-    const topicsList = document.getElementById('topics-list');
-    const topicHeader = document.getElementById('topic');
-    topicsList.innerHTML = '';
-    topicHeader.style.display = 'none';
+    document.getElementById('topics-list').innerHTML = '';
     topicsLoaded = false;
 }
 
 // Camera Functions
+let cameraStream = null;
 async function openCamera() {
     try {
-        const modal = document.getElementById('cameraModal');
         const video = document.getElementById('cameraPreview');
-        
         cameraStream = await navigator.mediaDevices.getUserMedia({ video: true });
         video.srcObject = cameraStream;
-        modal.style.display = 'block';
+        document.getElementById('cameraModal').style.display = 'block';
     } catch (error) {
-        alert('Camera access error: ' + error.message);
+        alert('Error accessing camera: ' + error.message);
     }
 }
 
 function closeCamera() {
-    const modal = document.getElementById('cameraModal');
-    modal.style.display = 'none';
-    
+    document.getElementById('cameraModal').style.display = 'none';
     if (cameraStream) {
         cameraStream.getTracks().forEach(track => track.stop());
         cameraStream = null;
@@ -81,34 +96,11 @@ function closeCamera() {
 function capturePhoto() {
     const video = document.getElementById('cameraPreview');
     const canvas = document.createElement('canvas');
-    const context = canvas.getContext('2d');
-    
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
-    context.drawImage(video, 0, 0, canvas.width, canvas.height);
-    
-    const imageData = canvas.toDataURL('image/jpeg');
-    processImage(imageData);
+    canvas.getContext('2d').drawImage(video, 0, 0);
+    processImage(canvas.toDataURL('image/jpeg'));
     closeCamera();
-}
-
-async function processImage(imageData) {
-    const resultDiv = document.getElementById('result');
-    resultDiv.innerHTML = '<div class="loader"></div>';
-    
-    try {
-        const response = await fetch('/upload', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ image: imageData })
-        });
-        
-        const data = await response.json();
-        // Only update result div, not input field
-        resultDiv.innerHTML = `<p class="generated">${data.question}</p>`;
-    } catch (error) {
-        resultDiv.innerHTML = `Error: ${error.message}`;
-    }
 }
 
 // Core Functionality
@@ -122,7 +114,7 @@ async function generate() {
         return;
     }
 
-    resultDiv.innerHTML = '<div class="loader"></div>';
+    resultDiv.innerHTML = '<div class="loader">Generating...</div>';
 
     try {
         const response = await fetch('/generate', {
@@ -131,31 +123,50 @@ async function generate() {
             body: JSON.stringify({ input, isTopic })
         });
 
+        if (!response.ok) throw new Error('Generation failed');
+        
         const data = await response.json();
         resultDiv.innerHTML = `<p class="generated">${data.question}</p>`;
     } catch (error) {
-        resultDiv.innerHTML = `Error: ${error.message}`;
+        resultDiv.innerHTML = `<p class="error">Error: ${error.message}</p>`;
     }
 }
 
+async function processImage(imageData) {
+    const resultDiv = document.getElementById('result');
+    resultDiv.innerHTML = '<div class="loader">Processing image...</div>';
+
+    try {
+        const response = await fetch('/upload', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ image: imageData })
+        });
+
+        if (!response.ok) throw new Error('Image processing failed');
+        
+        const data = await response.json();
+        resultDiv.innerHTML = `<p class="generated">${data.question}</p>`;
+    } catch (error) {
+        resultDiv.innerHTML = `<p class="error">Error: ${error.message}</p>`;
+    }
+}
+
+// Event Listeners
 function handleKeyPress(event) {
     if (event.key === 'Enter') generate();
 }
 
-// Tab Management
-function switchTab(tabName) {
-    if (tabName === 'generator') {
-        clearPopularTopics();
-    }
+document.addEventListener('DOMContentLoaded', () => {
+    switchTab('generator');
+    document.getElementById('input').focus();
+});
 
-    document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-    document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-    
-    document.getElementById(tabName).classList.add('active');
-    document.querySelector(`button[onclick="switchTab('${tabName}')"]`).classList.add('active');
-
-    if (tabName === 'popular') {
-        document.getElementById('topic').style.display = 'block';
-        if (!topicsLoaded) loadPopularTopics();
-    }
-}
+// Global Exports
+window.toggleTheme = toggleTheme;
+window.switchTab = switchTab;
+window.openCamera = openCamera;
+window.closeCamera = closeCamera;
+window.capturePhoto = capturePhoto;
+window.generate = generate;
+window.handleKeyPress = handleKeyPress;

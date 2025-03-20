@@ -14,16 +14,16 @@
     </div>
     <div class="container">
         <div class="glass-card">
-            <div class="tabs">
-                <button class="tab active" onclick="switchTab('generator')">
-                    <i class="fas fa-magic"></i> Generator
-                </button>
-                <button class="tab" onclick="switchTab('popular')">
-                    <i class="fas fa-chart-line"></i> Popular
-                </button>
+            <div class="slider-container">
+                <div class="slider-switch" data-active="generator">
+                    <div class="slider-label active" onclick="switchTab('generator')">Generator</div>
+                    <div class="slider-label" onclick="switchTab('popular')">Popular</div>
+                    <div class="slider-pill"></div>
+                </div>
             </div>
-            
-            <div id="generator" class="tab-content active">
+
+            <!-- Generator Content -->
+            <div class="tab-content active" id="generator">
                 <h1 class="title"><i class="fas fa-question-circle"></i> Question Genius</h1>
                 <div class="input-group">
                     <div class="input-container">
@@ -43,10 +43,9 @@
                 <div id="result" class="result-box"></div>
             </div>
 
-            <div id="popular" class="tab-content">
-                <h1 id="topic" class="title" style="display: none;">
-                    <i class="fas fa-fire"></i> Trending Topics
-                </h1>
+            <!-- Popular Content -->
+            <div class="tab-content popular-slide" id="popular">
+                <h1 class="title"><i class="fas fa-fire"></i> Trending Topics</h1>
                 <div id="topics-list" class="topics-container"></div>
             </div>
         </div>
