@@ -104,7 +104,7 @@ async function processImage(imageData) {
         });
         
         const data = await response.json();
-        document.getElementById('input').value = data.question;
+        // Only update result div, not input field
         resultDiv.innerHTML = `<p class="generated">${data.question}</p>`;
     } catch (error) {
         resultDiv.innerHTML = `Error: ${error.message}`;
