@@ -120,6 +120,39 @@ function capturePhoto() {
     closeCamera();
 }
 
+// File Handling Functions
+function handleFileSelect(file) {
+    const reader = new FileReader();
+    reader.onload = (e) => processImage(e.target.result);
+    reader.readAsDataURL(file);
+}
+
+function initDragDrop() {
+    const inputContainer = document.querySelector('.input-container');
+    const fileInput = document.getElementById('fileInput');
+
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files[0]) handleFileSelect(e.target.files[0]);
+    });
+
+    inputContainer.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        inputContainer.classList.add('drag-over');
+    });
+
+    inputContainer.addEventListener('dragleave', () => {
+        inputContainer.classList.remove('drag-over');
+    });
+
+    inputContainer.addEventListener('drop', (e) => {
+        e.preventDefault();
+        inputContainer.classList.remove('drag-over');
+        if (e.dataTransfer.files[0]) {
+            handleFileSelect(e.dataTransfer.files[0]);
+        }
+    });
+}
+
 // Core Functionality
 async function generate() {
     const input = document.getElementById('input').value.trim();
@@ -177,6 +210,7 @@ function handleKeyPress(event) {
 document.addEventListener('DOMContentLoaded', () => {
     switchTab('generator');
     document.getElementById('input').focus();
+    initDragDrop();
 });
 
 // Global Exports

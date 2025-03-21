@@ -221,19 +221,58 @@ body::after {
 
 input#input {
     width: 100%;
-    padding: 16px 24px 16px 52px;
+    padding: 16px 100px 16px 52px;
     border: 1px solid var(--border-color);
     border-radius: 12px;
     background: var(--card-bg);
     color: var(--text-color);
     font-size: 16px;
     transition: all 0.3s ease;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 input#input:focus {
     outline: none;
     border-color: var(--primary-color);
     box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.15);
+}
+
+.paperclip-icon {
+    position: absolute;
+    right: 60px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-color);
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.paperclip-icon:hover {
+    color: var(--primary-color);
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+}
+
+.camera-icon {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-color);
+    cursor: pointer;
+    background: var(--card-bg);
+    padding: 8px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.camera-icon:hover {
+    color: var(--primary-color);
+    border: 1px solid var(--border-color);
 }
 
 .checkbox-label {
@@ -325,24 +364,6 @@ input#input:focus {
     transform: translateX(8px);
 }
 
-.camera-icon {
-    position: absolute;
-    right: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--text-color);
-    cursor: pointer;
-    background: var(--card-bg);
-    padding: 8px;
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
-    transition: all 0.3s ease;
-}
-
-.camera-icon:hover {
-    color: var(--primary-color);
-}
-
 .modal {
     display: none;
     position: fixed;
@@ -354,7 +375,6 @@ input#input:focus {
     backdrop-filter: blur(8px);
     z-index: 9999;
 }
-
 
 .modal-content {
     position: relative;
@@ -415,26 +435,8 @@ input#input:focus {
     background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
     box-shadow: 0 4px 12px var(--shadow-color);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    margin-left: 120px;
-}
-
-.capture-btn i, .switch-camera-btn i {
-    color: var(--text-color);
-    font-size: 1.4em;
-    filter: drop-shadow(0 2px 4px var(--shadow-color));
-}
-
-/* ... (keep remaining styles the same) */
-
-.capture-btn {
-    position: relative;
-    left: 50%;
-}
-
-.switch-camera-btn {
     position: absolute;
-    left: calc(50% + 60px);
+    left: left: calc(50% + 80px)
 }
 
 .capture-btn i, .switch-camera-btn i {
@@ -452,9 +454,16 @@ input#input:focus {
     transform: scale(0.95);
 }
 
-.close{
-    color:aliceblue;
-    margin-left:-569px;
+.close {
+    color: var(--text-color);
+    margin-left: -569px;
+    font-size: 28px;
+    cursor: pointer;
+}
+
+.drag-over {
+    border: 2px dashed var(--primary-color) !important;
+    background: rgba(var(--primary-color-rgb), 0.1) !important;
 }
 
 @media (max-width: 768px) {
@@ -474,10 +483,18 @@ input#input:focus {
     }
     
     input#input {
-        padding: 14px 20px 14px 48px;
+        padding: 14px 80px 14px 48px;
+    }
+
+    .paperclip-icon {
+        right: 50px;
+    }
+
+    .camera-icon {
+        right: 15px;
     }
 
     .switch-camera-btn {
-        left: calc(50% + 50px);
+        left: calc(50% + 70px);
     }
 }
