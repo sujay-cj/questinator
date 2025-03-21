@@ -54,7 +54,7 @@ async function loadPopularTopics() {
         const topics = await response.json();
         
         topicsList.innerHTML = topics.map(topic => `
-            <div class="topic-item">
+            <div class="topic-item" onclick="handleTopicClick('${topic.topic.replace(/'/g, "\\'")}')">
                 <span>${topic.topic}</span>
                 <span>${topic.count} times</span>
             </div>
@@ -120,7 +120,7 @@ function capturePhoto() {
     closeCamera();
 }
 
-// File Handling Functions
+// File Handling
 function handleFileSelect(file) {
     const reader = new FileReader();
     reader.onload = (e) => processImage(e.target.result);
@@ -182,6 +182,15 @@ async function generate() {
     }
 }
 
+function handleTopicClick(topic) {
+    console.log('Handling topic click:', topic);
+    const inputField = document.getElementById('input');
+    inputField.value = topic;
+    document.getElementById('isTopic').checked = true;
+    switchTab('generator');
+    generate();
+}
+
 async function processImage(imageData) {
     const resultDiv = document.getElementById('result');
     resultDiv.innerHTML = '<div class="loader">Processing image...</div>';
@@ -222,3 +231,4 @@ window.capturePhoto = capturePhoto;
 window.generate = generate;
 window.handleKeyPress = handleKeyPress;
 window.switchCamera = switchCamera;
+window.handleTopicClick = handleTopicClick;

@@ -50,7 +50,8 @@ app.post('/generate', async (req, res) => {
 app.post('/upload', async (req, res) => {
     try {
         const imageData = req.body.image;
-        const question = await analyzeImage(imageData);
+        const base64Data = imageData.replace(/^data:image\/\w+;base64,/, '');
+        const question = await analyzeImage(base64Data);
         res.json({ question });
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -77,11 +78,11 @@ async function modifyQuestion(question) {
     return (await result.response).text();
 }
 
-async function analyzeImage(imageData) {
+async function analyzeImage(base64Data) {
     const prompt = "This is a photo of a question. Generate a similar question maintaining the same structure but changing numerical values and specific details where appropriate.";
     const imagePart = {
         inlineData: {
-            data: imageData.split(',')[1],
+            data: base64Data,
             mimeType: 'image/jpeg'
         }
     };

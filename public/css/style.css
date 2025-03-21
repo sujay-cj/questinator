@@ -437,7 +437,7 @@ input#input:focus {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: absolute;
     left: left: calc(50% + 80px)
-}
+} 
 
 .capture-btn i, .switch-camera-btn i {
     color: var(--text-color);
