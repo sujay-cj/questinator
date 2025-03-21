@@ -30,12 +30,10 @@ function switchTab(tabName) {
     const switchContainer = document.querySelector('.slider-switch');
     const labels = document.querySelectorAll('.slider-label');
 
-    // Update active state
     switchContainer.setAttribute('data-active', tabName);
     labels.forEach(label => label.classList.remove('active'));
     document.querySelector(`.slider-label[onclick="switchTab('${tabName}')"]`).classList.add('active');
 
-    // Handle content transitions
     if (tabName === 'popular') {
         popularContent.classList.add('active');
         if (!topicsLoaded) loadPopularTopics();
@@ -74,15 +72,33 @@ function clearPopularTopics() {
 
 // Camera Functions
 let cameraStream = null;
+let currentFacingMode = 'user';
+
 async function openCamera() {
     try {
         const video = document.getElementById('cameraPreview');
-        cameraStream = await navigator.mediaDevices.getUserMedia({ video: true });
+        if (cameraStream) {
+            cameraStream.getTracks().forEach(track => track.stop());
+        }
+        cameraStream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: currentFacingMode }
+        });
         video.srcObject = cameraStream;
         document.getElementById('cameraModal').style.display = 'block';
     } catch (error) {
         alert('Error accessing camera: ' + error.message);
     }
+}
+
+function switchCamera() {
+    const switchBtn = document.querySelector('.switch-camera-btn');
+    const icon = switchBtn.querySelector('i');
+    
+    icon.classList.add('clicked');
+    setTimeout(() => icon.classList.remove('clicked'), 600);
+    
+    currentFacingMode = currentFacingMode === 'user' ? 'environment' : 'user';
+    openCamera();
 }
 
 function closeCamera() {
@@ -91,6 +107,7 @@ function closeCamera() {
         cameraStream.getTracks().forEach(track => track.stop());
         cameraStream = null;
     }
+    currentFacingMode = 'user';
 }
 
 function capturePhoto() {
@@ -170,3 +187,4 @@ window.closeCamera = closeCamera;
 window.capturePhoto = capturePhoto;
 window.generate = generate;
 window.handleKeyPress = handleKeyPress;
+window.switchCamera = switchCamera;
